@@ -1,0 +1,21 @@
+# Raw source data (8 MB — not needed in image, processed JSON is copied instead)
+data/raw/
+
+# Python build and test tooling
+scripts/
+tests/
+__pycache__/
+*.pyc
+
+# Docs and planning
+docs/
+*.md
+CHANGELOG.md
+
+# VCS
+.git/
+.gitignore
+
+# Docker build files (nginx.conf is kept — needed by COPY in Dockerfile)
+docker/Dockerfile
+docker/docker-compose.yml

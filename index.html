@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tornado History Tracker - Huntsville, AL</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@10.8.0/ol.css" />
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <h1>Tornado History Tracker</h1>
+        <p>Past 30 years near Huntsville, Alabama</p>
+      </div>
+      <div style="display:flex;gap:0.5rem;align-items:center">
+        <a href="./wv.html" class="pill" style="color:#fff;text-decoration:none;">Compare WV &#8594;</a>
+        <div class="pill">OpenLayers + OSM</div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section id="viewDiv" aria-label="Map"></section>
+
+      <aside class="panel">
+
+        <!-- ─────────────────────────── MAP LEGEND ──────────────────────────── -->
+        <section class="legend-section">
+          <h2 class="legend-title">Map Legend</h2>
+
+          <!-- Risk zone gradient bar -->
+          <h3 class="legend-sub">Risk Zones <span class="legend-note">30-year historical exposure grid</span></h3>
+          <div class="risk-grad-strip"></div>
+          <div class="grad-labels">
+            <span>Least Dangerous</span>
+            <span>Most Dangerous</span>
+          </div>
+
+          <p class="legend-caution">
+            &#9888; <em>Green and yellow zones are <strong>not tornado-free.</strong> They reflect lower historical frequency compared to red zones — EF0–EF2 events can and do occur in lower-risk areas. These ratings are relative guidance based on 30 years of track data, not an all-clear.</em>
+          </p>
+
+          <div class="zone-cards">
+            <div class="zone-card">
+              <span class="zone-dot" style="background:#2c9456"></span>
+              <div>
+                <strong>Least Dangerous</strong>
+                Fewest tornado tracks in the 30-yr record. Often near terrain barriers (ridgelines, plateau edges) or the outer study area. EF0–EF1 events are still possible; injuries are historically rare in these cells.
+              </div>
+            </div>
+            <div class="zone-card">
+              <span class="zone-dot" style="background:#66b252"></span>
+              <div>
+                <strong>Low</strong>
+                Below-average exposure. Some tornado activity recorded nearby over 30 years. EF1–EF2 paths have occasionally passed through. Minor structural damage and injuries are uncommon but plausible.
+              </div>
+            </div>
+            <div class="zone-card">
+              <span class="zone-dot" style="background:#eca243"></span>
+              <div>
+                <strong>Moderate</strong>
+                Near the regional average. EF1–EF3 events documented within or adjacent to these cells. Injury risk is real during strong outbreak days; property damage is possible.
+              </div>
+            </div>
+            <div class="zone-card">
+              <span class="zone-dot" style="background:#e26034"></span>
+              <div>
+                <strong>High</strong>
+                Above-average tornado corridor. Multiple significant EF2–EF4 tracks cross this area over 30 years. Elevated history of property damage, injuries, and fatalities.
+              </div>
+            </div>
+            <div class="zone-card">
+              <span class="zone-dot" style="background:#a9241e"></span>
+              <div>
+                <strong>Most Dangerous</strong>
+                Located inside documented tornado super-corridors — including the April 27, 2011 EF5 track. Highest cumulative risk score. Serious structural damage, injuries, and fatalities are part of the historical record here.
+              </div>
+            </div>
+          </div>
+
+          <!-- EF scale gradient bar -->
+          <h3 class="legend-sub">Enhanced Fujita (EF) Scale <span class="legend-note">tornado dot colors</span></h3>
+          <div class="ef-grad-strip"></div>
+          <div class="ef-grad-labels">
+            <span>EF0</span><span>EF1</span><span>EF2</span><span>EF3</span><span>EF4</span><span>EF5</span>
+          </div>
+
+          <div class="ef-rows">
+            <div class="ef-row">
+              <span class="ef-dot" style="background:#8bc34a"></span>
+              <div><strong>EF0</strong> &middot; 65–85 mph &mdash; Light damage. Tree branches broken, minor roof and sign damage. Injuries are possible.</div>
+            </div>
+            <div class="ef-row">
+              <span class="ef-dot" style="background:#f4d03f"></span>
+              <div><strong>EF1</strong> &middot; 86–110 mph &mdash; Moderate damage. Roofs peeled, mobile homes overturned, vehicles pushed off road.</div>
+            </div>
+            <div class="ef-row">
+              <span class="ef-dot" style="background:#f39c12"></span>
+              <div><strong>EF2</strong> &middot; 111–135 mph &mdash; Considerable damage. Roofs torn off, mobile homes destroyed, large trees snapped or uprooted.</div>
+            </div>
+            <div class="ef-row">
+              <span class="ef-dot" style="background:#e67e22"></span>
+              <div><strong>EF3</strong> &middot; 136–165 mph &mdash; Severe. Exterior walls collapse, trains overturned, most trees uprooted. Fatalities probable.</div>
+            </div>
+            <div class="ef-row">
+              <span class="ef-dot" style="background:#e74c3c"></span>
+              <div><strong>EF4</strong> &middot; 166–200 mph &mdash; Devastating. Well-built homes leveled, cars thrown significant distances. Fatalities likely.</div>
+            </div>
+            <div class="ef-row">
+              <span class="ef-dot" style="background:#8e44ad"></span>
+              <div><strong>EF5</strong> &middot; 201+ mph &mdash; Catastrophic. Strong-frame structures swept off foundations. Mass casualties. An EF5 struck near Huntsville on April 27, 2011.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ──────────────────────────── CONTROLS ───────────────────────────── -->
+        <h2>Risk Controls</h2>
+
+        <label for="minMag">Minimum EF/F Category</label>
+        <select id="minMag">
+          <option value="0">EF0+</option>
+          <option value="1">EF1+</option>
+          <option value="2">EF2+</option>
+          <option value="3">EF3+</option>
+          <option value="4">EF4+</option>
+          <option value="5">EF5 only</option>
+        </select>
+
+        <label for="yearStart">Year Range Start</label>
+        <input id="yearStart" type="number" />
+
+        <label for="yearEnd">Year Range End</label>
+        <input id="yearEnd" type="number" />
+
+        <label class="check">
+          <input id="toggleRisk" type="checkbox" checked />
+          Show risk zone layer
+        </label>
+
+        <label class="check">
+          <input id="togglePaths" type="checkbox" checked />
+          Show tornado paths
+        </label>
+
+        <button id="applyFilters">Apply Filters</button>
+
+        <h3>Findings</h3>
+        <div id="stats" class="stats"></div>
+
+        <h3>Candidate Zone Comparison</h3>
+        <p class="cmp-hint">Chapman Mountain vs Hampton Cove &mdash; 5-mile historical exposure radius</p>
+        <div id="candidateTable"></div>
+
+      </aside>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/ol@10.8.0/dist/ol.js"></script>
+    <!-- Popup overlay for feature info -->
+    <div id="popup" class="ol-popup">
+      <a href="#" id="popup-closer" class="ol-popup-closer">&#x2715;</a>
+      <div id="popup-content"></div>
+    </div>
+    <!-- Debug: catch uncaught JS errors and surface them on-screen -->
+    <div id="errBanner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;
+      background:#c0392b;color:#fff;padding:0.6rem 1rem;font-size:0.85rem;
+      font-family:monospace;white-space:pre-wrap;max-height:30vh;overflow:auto;"></div>
+    <script>
+      window.addEventListener("error", function(e) {
+        var b = document.getElementById("errBanner");
+        b.style.display = "block";
+        b.textContent += "JS ERROR: " + e.message + " (" + (e.filename||"") + ":" + e.lineno + ")\n";
+      });
+      window.addEventListener("unhandledrejection", function(e) {
+        var b = document.getElementById("errBanner");
+        b.style.display = "block";
+        b.textContent += "PROMISE REJECTION: " + (e.reason && e.reason.message ? e.reason.message : e.reason) + "\n";
+      });
+    </script>
+    <script src="./src/app.js"></script>
+  </body>
+</html>

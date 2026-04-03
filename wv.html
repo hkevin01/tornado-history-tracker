@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tornado History — Fayetteville & Bridgeport, WV</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@10.8.0/ol.css" />
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <h1>Tornado History Tracker &mdash; West Virginia</h1>
+        <p>Past 30 years &mdash; Fayetteville &amp; Bridgeport compared</p>
+      </div>
+      <div style="display:flex;gap:0.5rem;align-items:center">
+        <a href="./index.html" class="pill" style="color:#fff;text-decoration:none;">&#8592; Huntsville, AL</a>
+        <div class="pill">OpenLayers + OSM</div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section id="viewDiv" aria-label="Map"></section>
+
+      <aside class="panel">
+
+        <!-- ─────────────────────────── LEGEND ─────────────────────────────── -->
+        <section class="legend-section">
+          <h2 class="legend-title">Map Legend</h2>
+
+          <h3 class="legend-sub">Risk Zones <span class="legend-note">30-year historical exposure grid</span></h3>
+          <div class="risk-grad-strip"></div>
+          <div class="grad-labels">
+            <span>Least Dangerous</span>
+            <span>Most Dangerous</span>
+          </div>
+
+          <p class="legend-caution">
+            &#9888; <em>Green and yellow zones are <strong>not tornado-free.</strong> They reflect lower historical frequency compared to red zones &mdash; EF0&ndash;EF2 events can occur anywhere. WV overall has very low tornado risk due to the Appalachians, but isolated events do happen and can still cause damage.</em>
+          </p>
+
+          <div class="zone-cards">
+            <div class="zone-card">
+              <span class="zone-dot" style="background:#2c9456"></span>
+              <div><strong>Least Dangerous</strong>
+              Fewest tornado tracks over 30 years. Usually corresponds to high-elevation plateau terrain, deep gorges, or areas where complex topography consistently disrupts wind shear.</div>
+            </div>
+            <div class="zone-card">
+              <span class="zone-dot" style="background:#66b252"></span>
+              <div><strong>Low</strong>
+              Below-average exposure for the WV study area. Some tornado activity documented nearby. EF0&ndash;EF1 events are uncommon but historically possible.</div>
+            </div>
+            <div class="zone-card">
+              <span class="zone-dot" style="background:#eca243"></span>
+              <div><strong>Moderate</strong>
+              Near the regional average for WV. EF1&ndash;EF2 events have occurred nearby. These zones are often lower-valley terrain in river corridors.</div>
+            </div>
+            <div class="zone-card">
+              <span class="zone-dot" style="background:#e26034"></span>
+              <div><strong>High</strong>
+              Above-average exposure relative to WV standards. Multiple documented events in EF1&ndash;EF3 range. Usually associated with valleys that channel storms from the west.</div>
+            </div>
+            <div class="zone-card">
+              <span class="zone-dot" style="background:#a9241e"></span>
+              <div><strong>Most Dangerous</strong>
+              Highest relative risk in the WV study area. Note: &ldquo;Most Dangerous&rdquo; in WV is still substantially safer than &ldquo;Moderate&rdquo; in Huntsville, AL. Risk levels here are relative to the Appalachian region, not Dixie Alley.</div>
+            </div>
+          </div>
+
+          <h3 class="legend-sub">Enhanced Fujita (EF) Scale <span class="legend-note">tornado dot / path colors</span></h3>
+          <div class="ef-grad-strip"></div>
+          <div class="ef-grad-labels">
+            <span>EF0</span><span>EF1</span><span>EF2</span><span>EF3</span><span>EF4</span><span>EF5</span>
+          </div>
+
+          <div class="ef-rows">
+            <div class="ef-row"><span class="ef-dot" style="background:#8bc34a"></span>
+              <div><strong>EF0</strong> &middot; 65&ndash;85 mph &mdash; Light damage. Tree branches, minor roof damage. Most WV tornadoes fall here.</div></div>
+            <div class="ef-row"><span class="ef-dot" style="background:#f4d03f"></span>
+              <div><strong>EF1</strong> &middot; 86&ndash;110 mph &mdash; Moderate. Roofs peeled, mobile homes overturned. Documented in both WV study areas.</div></div>
+            <div class="ef-row"><span class="ef-dot" style="background:#f39c12"></span>
+              <div><strong>EF2</strong> &middot; 111&ndash;135 mph &mdash; Considerable. Roofs torn off, large trees uprooted. Rare but recorded in WV.</div></div>
+            <div class="ef-row"><span class="ef-dot" style="background:#e67e22"></span>
+              <div><strong>EF3</strong> &middot; 136&ndash;165 mph &mdash; Severe. Walls collapse, fatalities probable. Very rare in mountainous WV.</div></div>
+            <div class="ef-row"><span class="ef-dot" style="background:#e74c3c"></span>
+              <div><strong>EF4</strong> &middot; 166&ndash;200 mph &mdash; Devastating. No EF4+ events in these WV study areas during the 30-year record.</div></div>
+            <div class="ef-row"><span class="ef-dot" style="background:#8e44ad"></span>
+              <div><strong>EF5</strong> &middot; 201+ mph &mdash; Catastrophic. No EF5 ever recorded in WV. Compare to the April 27, 2011 EF5 that struck near Huntsville, AL.</div></div>
+          </div>
+        </section>
+
+        <!-- ─────────────────────────── CONTROLS ───────────────────────────── -->
+        <h2>Risk Controls</h2>
+
+        <label for="minMag">Minimum EF/F Category</label>
+        <select id="minMag">
+          <option value="0">EF0+</option>
+          <option value="1">EF1+</option>
+          <option value="2">EF2+</option>
+          <option value="3">EF3+</option>
+        </select>
+
+        <label for="yearStart">Year Range Start</label>
+        <input id="yearStart" type="number" />
+
+        <label for="yearEnd">Year Range End</label>
+        <input id="yearEnd" type="number" />
+
+        <label class="check">
+          <input id="toggleRisk" type="checkbox" checked />
+          Show risk zone layer
+        </label>
+
+        <label class="check">
+          <input id="togglePaths" type="checkbox" checked />
+          Show tornado paths
+        </label>
+
+        <button id="applyFilters">Apply Filters</button>
+
+        <h3>Findings</h3>
+        <div id="stats" class="stats"></div>
+
+        <h3>City Comparison</h3>
+        <p class="cmp-hint">Fayetteville, WV vs Bridgeport, WV &mdash; 5-mile historical exposure radius per city center</p>
+        <div id="candidateTable"></div>
+
+      </aside>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/ol@10.8.0/dist/ol.js"></script>
+    <div id="popup" class="ol-popup">
+      <a href="#" id="popup-closer" class="ol-popup-closer">&#x2715;</a>
+      <div id="popup-content"></div>
+    </div>
+    <div id="errBanner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;
+      background:#c0392b;color:#fff;padding:0.6rem 1rem;font-size:0.85rem;
+      font-family:monospace;white-space:pre-wrap;max-height:30vh;overflow:auto;"></div>
+    <script>
+      window.addEventListener("error", function(e) {
+        var b = document.getElementById("errBanner");
+        b.style.display = "block";
+        b.textContent += "JS ERROR: " + e.message + " (" + (e.filename||"") + ":" + e.lineno + ")\n";
+      });
+      window.addEventListener("unhandledrejection", function(e) {
+        var b = document.getElementById("errBanner");
+        b.style.display = "block";
+        b.textContent += "PROMISE REJECTION: " + (e.reason && e.reason.message ? e.reason.message : e.reason) + "\n";
+      });
+    </script>
+    <script src="./src/app_wv.js"></script>
+  </body>
+</html>

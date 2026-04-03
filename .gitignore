@@ -1,0 +1,9 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Local environment
+.env
+
+# Raw downloaded source data
+data/raw/*.csv
