@@ -105,12 +105,19 @@ class WVIsNearCityTests(unittest.TestCase):
         ev = self._make_event(37.84, -85.48)
         self.assertFalse(is_near_city(ev, bpt_city))
 
-    def test_oak_hill_secondary_anchor_included(self):
-        """Edge path: event near Oak Hill anchor is within the Fayetteville study area."""
+    def test_event_just_outside_radius_excluded(self):
+        """Edge path: event 21+ miles from Fayetteville center is excluded."""
         fay_city = next(c for c in CITIES if c["key"] == "fayetteville")
-        # Oak Hill anchor is (37.9751, -81.1512) — place event 5 miles away
-        ev = self._make_event(37.975, -81.20)
-        self.assertTrue(is_near_city(ev, fay_city))
+        # ~21 miles due west of Fayetteville center (lon=-81.50)
+        ev = self._make_event(38.0512, -81.50)
+        self.assertFalse(is_near_city(ev, fay_city))
+
+    def test_event_just_inside_radius_included(self):
+        """Edge path: event ~18 miles from Bridgeport center is included."""
+        bpt_city = next(c for c in CITIES if c["key"] == "bridgeport")
+        # ~15 miles north of Bridgeport
+        ev = self._make_event(39.52, -80.25)
+        self.assertTrue(is_near_city(ev, bpt_city))
 
 
 class WVRegionAnnotationTests(unittest.TestCase):

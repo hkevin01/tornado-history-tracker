@@ -3,9 +3,9 @@
 // Midpoint between Fayetteville (38.0512, -81.1070) and Bridgeport (39.2965, -80.2513)
 const CENTER_LAT = 38.6739;
 const CENTER_LON = -80.6792;
-// Clip-radius is large enough to encompass both cities' 35-mile study zones.
-// Fayetteville is ~86 mi from midpoint; Bridgeport is ~86 mi from midpoint.
-const PATH_CLIP_MILES = 92;
+// Clip-radius covers both 20-mile study circles plus the ~86-mile half-span between
+// the two city centers, giving ~106 miles needed from the midpoint.
+const PATH_CLIP_MILES = 110;
 
 function colorForMagnitude(mag) {
   if (mag >= 5) return "#8e44ad";

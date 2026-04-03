@@ -26,25 +26,21 @@ CITIES = [
     {
         "key": "fayetteville", "name": "Fayetteville, WV",
         "lat": 38.0512, "lon": -81.1070,
-        # Secondary anchors: Oak Hill (6 mi S) and Ansted (5 mi E) are part of the
-        # same metro area. Checking all three catches events near any of them.
-        "anchors": [
-            (38.0512, -81.1070),  # Fayetteville
-            (37.9751, -81.1512),  # Oak Hill
-            (38.0760, -81.0970),  # Ansted
-            (38.1567, -81.1959),  # Gauley Bridge
-        ],
+        # Strict 20-mile single-point radius — only events genuinely close to the city.
+        "radius_miles": 20,
+        # Grid span covers the 20-mile study circle with a small margin.
+        "grid_lat_span": 0.32,
+        "grid_lon_span": 0.40,
     },
     {
         "key": "bridgeport", "name": "Bridgeport, WV",
         "lat": 39.2965, "lon": -80.2513,
-        "anchors": [
-            (39.2965, -80.2513),  # Bridgeport
-            (39.2814, -80.3445),  # Clarksburg
-        ],
+        # Strict 20-mile single-point radius.
+        "radius_miles": 20,
+        "grid_lat_span": 0.32,
+        "grid_lon_span": 0.40,
     },
 ]
-RADIUS_MILES = 38.0  # per-anchor radius; Oak Hill+Ansted anchors extend effective FAY coverage
 
 # ── Geographic region annotations ─────────────────────────────────────────────
 # (lat_min, lat_max, lon_min, lon_max, short_name, explanation)
@@ -280,21 +276,16 @@ def load_events() -> list[TornadoEvent]:
 
 
 def is_near_city(event: TornadoEvent, city: dict) -> bool:
-    """Return True if any interpolated track point is within RADIUS_MILES of any
-    of the city's anchor coordinates.  Checking only start/end misses tornadoes
-    that track through the study area with both endpoints just outside it.
-    Using multiple anchors (e.g. Oak Hill + Ansted + Fayetteville) ensures
-    events near any part of the metro area are included.
+    """Return True if the event start or end point is within city['radius_miles'] of
+    the city center.  Strict single-point radius — no anchors, no exclusions.
     """
-    anchors = city.get("anchors", [(city["lat"], city["lon"])])
-    track_pts = interpolate_track(event, sample_miles=1.0)
-    # Add explicit start/end in case interpolation is coarse
-    track_pts = [(event.start_lat, event.start_lon)] + track_pts + [(event.end_lat, event.end_lon)]
-    for plat, plon in track_pts:
-        for alat, alon in anchors:
-            if haversine_miles(alat, alon, plat, plon) <= RADIUS_MILES:
-                return True
-    return False
+    radius = city["radius_miles"]
+    clat   = city["lat"]
+    clon   = city["lon"]
+    return (
+        haversine_miles(clat, clon, event.start_lat, event.start_lon) <= radius
+        or haversine_miles(clat, clon, event.end_lat, event.end_lon) <= radius
+    )
 
 
 def interpolate_track(event: TornadoEvent, sample_miles: float = 0.5) -> list[tuple[float, float]]:
@@ -320,12 +311,14 @@ def build_risk_zones(city: dict, events: list[TornadoEvent],
     step       = 0.02   # ~1.4 miles
     sigma_mi   = 2.5    # tight: zones follow actual valley corridors and track locations
 
-    lat_c = city["lat"]
-    lon_c = city["lon"]
-    lat_min = round(lat_c - 0.72, 6)
-    lat_max = round(lat_c + 0.72, 6)
-    lon_min = round(lon_c - 0.92, 6)
-    lon_max = round(lon_c + 0.92, 6)
+    lat_c     = city["lat"]
+    lon_c     = city["lon"]
+    lat_span  = city.get("grid_lat_span", 0.72)
+    lon_span  = city.get("grid_lon_span", 0.92)
+    lat_min   = round(lat_c - lat_span, 6)
+    lat_max   = round(lat_c + lat_span, 6)
+    lon_min   = round(lon_c - lon_span, 6)
+    lon_max   = round(lon_c + lon_span, 6)
 
     two_sigma_sq = 2.0 * sigma_mi ** 2
 
@@ -429,7 +422,7 @@ def main() -> None:
             "source":         "data/raw/spc_1950_2024_actual_tornadoes.csv",
             "year_range":     [min_year, latest_year],
             "cities":         CITIES,
-            "radius_miles":   RADIUS_MILES,
+            "radius_miles":   {city["key"]: city["radius_miles"] for city in CITIES},
             "counts": {
                 city["key"]: len(city_events[city["key"]]) for city in CITIES
             },
