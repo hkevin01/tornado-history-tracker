@@ -61,7 +61,25 @@ Phase 5 Gate: PASS
 - [x] Container starts and passes health check
 - [x] HTTP 200 on `/index.html` and `/data/processed/huntsville_tornadoes_30y.json`
 
+## Phase 6 - West Virginia Dual-City Tracker
+- [x] Build `scripts/build_dataset_wv.py` processing both Fayetteville and Bridgeport study zones.
+- [x] Generate `data/processed/wv_tornadoes_30y.json` with per-city risk zones and shared event list.
+- [x] Build `wv.html` using OpenLayers + OpenStreetMap (replaces ESRI dependency for WV page).
+- [x] Build `src/app_wv.js` — full feature parity with the Huntsville app: tornado dots, path arrows, risk zones, filters, stats panel, and city comparison table.
+- [x] Add geographic region annotations for all sub-zones in both study areas.
+- [x] Add navigation link between the Huntsville and WV pages.
+- [x] Verify Docker image serves `wv.html` and WV dataset correctly.
+- [x] Add unit tests for WV build-script helpers.
+
+Phase 6 Gate: PASS
+- [x] Tasks complete
+- [x] WV dataset builds successfully
+- [x] wv.html loads in browser with risk zones, tornado layers, and comparison table
+- [x] All unit tests pass
+- [x] README and CHANGELOG updated
+
 ## Implementation Notes
 - Data source: NOAA/SPC historical tornado CSV.
-- Mapping engine: ArcGIS JavaScript API (ESRI web map).
+- Mapping engine: ArcGIS JavaScript API (ESRI web map) for Huntsville; OpenLayers + OSM for West Virginia.
 - Risk model: weighted tornado density and intensity on a regular grid.
+- WV script uses multi-anchor city detection and track interpolation for improved accuracy.
