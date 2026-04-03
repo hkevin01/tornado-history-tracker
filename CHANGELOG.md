@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.4.0 - 2026-04-03
+
+- Added `wv.html` — West Virginia dual-city tracker (Fayetteville vs Bridgeport) using OpenLayers + OSM.
+- Added `src/app_wv.js` with full feature parity: risk zones, tornado dots, path arrows, filters, stats panel, and comparison table.
+- Added `scripts/build_dataset_wv.py` for Fayetteville (4-anchor multi-point detection) and Bridgeport study areas.
+- Added geographic terrain annotation for all WV risk-zone sub-regions (13 annotated areas total).
+- Added `tests/test_build_dataset_wv.py` — 23 unit tests for WV pipeline helpers.
+- Added navigation link between Huntsville and WV pages.
+- Updated `README.md` to showcase-quality with Mermaid diagrams, badges, and full project coverage.
+- Updated `docs/project_plan.md` with Phase 6 gate checklist.
+
 ## 0.3.0 - 2026-04-02
 
 - Added `docker/Dockerfile` using nginx:alpine to containerise the static web app.
